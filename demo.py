@@ -5,6 +5,7 @@ Created on 9 Oct 2020
 @author: Christoph Minz
 @license: BSD 3-Clause
 '''
+#%%
 from __future__ import annotations
 from typing import List, Tuple  # @UnusedImport
 from causets.sprinkledcauset import SprinkledCauset  # @UnresolvedImport
@@ -20,6 +21,7 @@ S: CoordinateShape = CoordinateShape(3, 'cylinder', duration=3.0, hollow=0.3)
 C: SprinkledCauset = SprinkledCauset(intensity=100.0,
                                      spacetime=deSitterSpacetime(3), shape=S)
 e: CausetEvent = C.CentralAntichain().pop()  # pick one event
+
 
 # Plotting setup:
 cplt.setDefaultColors('UniYork')  # using University of York brand colours
@@ -46,3 +48,5 @@ if len(dims) > 2:
     ax.set_zlabel('space' if dims[2] > 0 else 'time')
     ax.grid(False)
 cplt.show()
+#%%
+

@@ -1,3 +1,4 @@
+ICL MSci project code
 # Introduction
 Causal set theory is a framework for quantum gravity where the classical spacetime manifold is replaces by the discrete structure of locally finite, partially ordered sets i.e., causal sets or short causets. This repository contains Python modules for numerical investigations of causal set theory.
 

@@ -5,6 +5,7 @@ Created on 9 Oct 2020
 @author: Christoph Minz
 @license: BSD 3-Clause
 '''
+
 from __future__ import annotations
 from typing import List, Tuple  # @UnusedImport
 from causets.sprinkledcauset import SprinkledCauset  

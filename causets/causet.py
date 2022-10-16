@@ -521,8 +521,9 @@ class Causet(object):
         for e in es:
             e.disjoin()
     
-    def cgrain(self, card : int = None, perc : float = 0.2):
+    def cgrain(self, card = None, perc : float = 0.2):
         self.coarsegrain(card : int = None, perc : float = 0.2)
+
 
 
     ####################################################################

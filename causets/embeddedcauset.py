@@ -263,25 +263,25 @@ class EmbeddedCauset(Causet):
         fractal dimension (not necesseraly int).
 
         Parameters:
-        __________
-        - d0: float
-            Initial guess for dimension.\
+        ---------------------------------------------------------------
+        - d0: float\n
+            Initial guess for dimension.\n
             Default is 2.
 
-        - Nsamples: int
+        - Nsamples: int\n
             Number of times to iterate procedure to average on.\
             Default is 20.
 
-        - ptime_constr: callable(ptime) -> Bool
+        - ptime_constr: callable(ptime) -> Bool\n
             A callable setting a constraint on the proper time between
-            the two elements and returning a Boolean.\
+            the two elements and returning a Boolean.\n
             Default: None.
 
-        - size_min: int
-            Minimum size of Alexandrov Sets on which apply estimators.\
+        - size_min: int\n
+            Minimum size of Alexandrov Sets on which apply estimators.\n
             Default is 20 elements.
         
-        - optimizer: callable(funct, guess, args, ....) -> list
+        - optimizer: callable(funct, guess, args, ....) -> list\n
             A function which takes as args: 
             - funct whose roots are to be found
             - initial guess
@@ -289,19 +289,24 @@ class EmbeddedCauset(Causet):
             and returns a array-like obj with:
             - numerical result
             - a flag saying whether it was successful.
-            - maybe other stuff\
+            - maybe other stuff\n
             Default is sp.optimizer.fsolve.
         
-        - opt_sol_index: int
+        - opt_sol_index: int\n
             The optimizer returns a list of stuff. opt_sol_index
-            is the index at which the numerical solution is found.
+            is the index at which the numerical solution is found.\n
             Default 0 (which is the case for most optimizers).
         
-        - opt_flag_index: int
+        - opt_flag_index: int\n
             The optimizer returns a list of stuff. opt_flag_index
             is the index at which the flag specifying whether it was
-            successful or not is found.
+            successful or not is found.\n
             Default 2.
+        
+        Return
+        ------------------------------------------
+        - dimension estimate: float
+        - dimension std: float
         '''
 
         if not isinstance(self._spacetime, spacetimes.FlatSpacetime):

@@ -13,6 +13,7 @@ from typing import Set, Iterable, List, Any, Tuple, Iterator, Union, Optional
 from causets.causetevent import CausetEvent  # @UnresolvedImport
 
 import numpy as np
+import random
 import itertools
 
 
@@ -465,18 +466,18 @@ class Causet(object):
     # PROPER CAUSAL SETS KINEMATICS
     #___________________________________________________________________
     ####################################################################
+    def __len__(self):
+        """
+        len method returning cardinality
+        """
+        return len(self._events)
+
     @staticmethod
     def len(other: 'Causet') -> int:
         '''
         Returns the number of events (set cardinality) of some Causet instance. 
         '''
         return len(other._events)
-
-    def __len__(self):
-        """
-        len method returning cardinality
-        """
-        return len(self._events)
 
     @property
     def Card(self) -> int:
@@ -504,6 +505,24 @@ class Causet(object):
             nrelations += ei.PastCard()
         fr = 2 * nrelations / ( N * (N-1) )
         return fr
+
+    def coarsegrain(self, card : int = None, perc : float = 0.2):
+        """
+        Coarse Grain the Causet by:
+        - removing <card> events, if card given;
+        - removing <int(perc * C.Card)> events, if card not given;\n
+        Default is card None and perc = 0.2.
+        """
+        if card is None:
+            card = int(len(self) * perc)
+        
+        es = random.choices(self._events, k = card)
+
+        for e in es:
+            e.disjoin()
+    
+    def cgrain(self, card : int = None, perc : float = 0.2):
+        self.coarsegrain(card : int = None, perc : float = 0.2)
 
 
     ####################################################################

@@ -238,8 +238,8 @@ class EmbeddedCauset(Causet):
         Note: returns complex value is spacelike interval.
         Not sure if correct in non-flat spacetime.
         """
-        avec = a.Coordinates()
-        bvec = b.Coordinates()
+        avec = a.Coordinates
+        bvec = b.Coordinates
         return self._spacetime.ds(avec, bvec)
 
     def ptime_est(self, a: CausetEvent, b: CausetEvent) -> int:
@@ -257,13 +257,14 @@ class EmbeddedCauset(Causet):
                 size_min = 20,
                 optimizer = fsolve,
                 opt_sol_index = 0,
-                opt_sol_flag = 2) -> float:
+                opt_flag_index = 2,
+                **optkwargs) -> float:
         '''
         Use Myrheim-Meyers dimensional estimator to compute the 
         fractal dimension (not necesseraly int).
 
         Parameters:
-        ---------------------------------------------------------------
+        --------------------------
         - d0: float\n
             Initial guess for dimension.\n
             Default is 2.
@@ -303,8 +304,11 @@ class EmbeddedCauset(Causet):
             successful or not is found.\n
             Default 2.
         
+        - **optkwargs: \n
+            kwargs to be passed to optimizer.
+        
         Return
-        ------------------------------------------
+        --------------------------
         - dimension estimate: float
         - dimension std: float
         '''
@@ -313,49 +317,78 @@ class EmbeddedCauset(Causet):
             print("NOTE for MM Estimator: this is currently working\
                 as if the spacetime was flat.")
            
-            def MM_drelation(d):
-                a = sp.special.gamma(d+1)
-                b = sp.special.gamma(d/2)
-                c = 4 * sp.special.gamma(3*d/2)
-                return a*b/c
-            
-            def MM_to_solve(d, ord_fr):
-                return MM_drelation(d) - ord_fr/2
+        def MM_drelation(d):
+            a = sp.special.gamma(d+1)
+            b = sp.special.gamma(d/2)
+            c = 4 * sp.special.gamma(3*d/2)
+            return a*b/c
+        
+        def MM_to_solve(d, ord_fr):
+            return MM_drelation(d) - ord_fr/2
 
-            N = len(self)
-            destimates = []
-            isample = 0
-            while isample < Nsamples:
-                # pick two random elements
-                a, b = random.choices(self._events, 2)
-                # if linked, ptime respects the constraint, 
-                # and the size of the interval is big enough
-                if CausetEvent.isCausalTo(a, b):
-                    if ptime_constr is None:
-                        if self.IntervalCard(a,b) >= size_min:
-                            fr_i = self.ord_fr(self.Interval(a,b, 
-                                                    disjoin=True))
-                            sol_i = optimizer(MM_to_solve, d0, fr_i)
-                            if sol_i[opt_sol_flag] == 1: 
+        N = len(self)
+        destimates = []
+        isample = 0
+        counts = [0,0] #times it worked vs times it did not
+        while isample < Nsamples:
+            if counts[1]-Nsamples>=1000 and counts[0]==0:
+                print("The algorithm never found a suitable Alexandrov\n\
+                Interval, whereas it found 1000 unsuitable: probably\n\
+                you picked a too small causet. Returning [NaN, NaN]")
+                return np.nan, np.nan
+            # pick two random elements
+            a, b = random.sample(self._events, k = 2)
+            # if linked, ptime respects the constraint, 
+            # and the size of the interval is big enough
+            if CausetEvent.isCausalTo(a, b):
+                if ptime_constr is None:
+                    if self.IntervalCard(a,b) >= size_min:
+                        fr_i = self.ord_fr(self.Interval(a,b, 
+                                                disjoin=True))
+                        if fr_i == 1:
+                            destimates.append(1)
+                        else:
+                            sol_i = optimizer(MM_to_solve, d0, fr_i,
+                                                **optkwargs)
+                            if not (opt_flag_index is None):
+                                if sol_i[opt_flag_index] == 1: 
+                                    d_i= sol_i[opt_sol_index]
+                                    destimates.append(d_i)
+                                    isample += 1
+                                else:
+                                    continue
+                            else:
                                 d_i= sol_i[opt_sol_index]
                                 destimates.append(d_i)
                                 isample += 1
+                elif self.IntervalCard(a,b) >= size_min:
+                    counts[0] += 1
+                    if ptime_constr(self.ptime(a, b)):
+                #Note: switched order between intervalcard and ptime
+                # as in generic spacetime ptime might take more.
+                        fr_i = self.ord_fr(self.Interval(a,b,
+                                        disjoin = True))
+                        if fr_i == 1:
+                            destimates.append(1)
+                        else:
+                            sol_i = optimizer(MM_to_solve, d0, fr_i,
+                                                **optkwargs)
+                            if not (opt_flag_index is None):
+                                if sol_i[opt_flag_index] == 1: 
+                                    d_i= sol_i[opt_sol_index]
+                                    destimates.append(d_i)
+                                    isample += 1
+                                else:
+                                    continue
                             else:
-                                continue
-                    elif self.IntervalCard(a,b) >= size_min:
-                        if ptime_constr(self.ptime(a, b)):
-                    #Note: switched order as in generic spacetime ptime
-                    #might take more.
-                            fr_i = self.ord_fr(self.Interval(a,b))
-                            sol_i = optimizer(MM_to_solve, d0, fr_i)
-                            if sol_i[opt_sol_flag] == 1: 
                                 d_i= sol_i[opt_sol_index]
                                 destimates.append(d_i)
                                 isample += 1
-                            else:
-                                continue
                 else:
+                    counts[1] += 1
                     continue
+            else:
+                continue
 
         return np.mean(destimates), np.std(destimates)
 

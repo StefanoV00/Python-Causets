@@ -5,14 +5,17 @@ Created on 9 Oct 2020
 @author: Christoph Minz
 @license: BSD 3-Clause
 '''
+
+# Small change
+# Change
 #%%
 from __future__ import annotations
-from typing import List, Tuple  # @UnusedImport
-from causets.sprinkledcauset import SprinkledCauset  # @UnresolvedImport
-from causets.spacetimes import deSitterSpacetime  # @UnresolvedImport
-from causets.shapes import CoordinateShape  # @UnresolvedImport
-from causets.causetevent import CausetEvent  # @UnresolvedImport @UnusedImport
-import causets.causetplotting as cplt  # @UnresolvedImport
+from typing import List, Tuple  
+from causets.sprinkledcauset import SprinkledCauset  
+from causets.spacetimes import deSitterSpacetime  
+from causets.shapes import CoordinateShape  
+from causets.causetevent import CausetEvent  
+import causets.causetplotting as cplt  
 
 # Create a sprinkle from de Sitter spacetime with cosmological horizon at
 # radius 1.0. Coordinates range over a hollow cylinder with height 3.0. 30% of

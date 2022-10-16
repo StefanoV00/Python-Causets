@@ -506,7 +506,7 @@ class Causet(object):
         fr = 2 * nrelations / ( N * (N-1) )
         return fr
 
-    def coarsegrain(self, card : int = None, perc : float = 0.2):
+    def coarsegrain(self, card = None, perc : float = 0.2):
         """
         Coarse Grain the Causet by:
         - removing <card> events, if card given;
